@@ -1,0 +1,7 @@
+telethon
+ncmdump
+cryptg
+aiohttp
+hachoir
+requests
+tgbot-ping
