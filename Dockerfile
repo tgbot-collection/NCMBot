@@ -1,9 +1,11 @@
 FROM python:alpine
 
 WORKDIR /NCMBot
-RUN apk update && apk add tzdata alpine-sdk libffi-dev git ca-certificates  --no-cache&& \
-git clone https://github.com/tgbot-collection/NCMBot /NCMBot && cd /NCMBot &&\
-pip install --no-cache-dir -r requirements.txt
+
+RUN apk update && apk add  --no-cache tzdata alpine-sdk libffi-dev git ca-certificates
+ADD requirements.txt /tmp/
+RUN pip3 install --no-cache-dir -r /tmp/requirements.txt && rm /tmp/requirements.txt
+COPY . /NCMBot
 
 ENV TZ=Asia/Shanghai
 
