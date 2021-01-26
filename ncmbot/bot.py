@@ -15,7 +15,7 @@ from helper import *
 from config import *
 from tgbot_ping import get_runtime
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(filename)s [%(levelname)s]: %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s [%(levelname)s]: %(message)s')
 
 bot = TelegramClient('bot', api_id, api_hash).start(bot_token=token)
 
