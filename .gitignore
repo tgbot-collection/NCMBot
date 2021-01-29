@@ -137,5 +137,5 @@ dmypy.json
 *.ncm
 *.mp3
 /ncmbot/client.session
-/ncmbot/bot.session
+/bot.session
 *.session

@@ -13,3 +13,4 @@ COPY . /NCMBot
 
 WORKDIR /NCMBot
 ENV TZ=Asia/Shanghai
+CMD ["python", "bot.py"]
