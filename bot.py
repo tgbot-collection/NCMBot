@@ -8,12 +8,12 @@
 __author__ = "Benny <benny.think@gmail.com>"
 
 import tempfile
+import os
 
 from telethon import TelegramClient, events
+from tgbot_ping import get_runtime
 
 from helper import *
-from config import *
-from tgbot_ping import get_runtime
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s [%(levelname)s]: %(message)s')
 
