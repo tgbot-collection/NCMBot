@@ -33,8 +33,7 @@ async def send_welcome(event):
 async def send_welcome(event):
     async with bot.action(event.chat_id, 'typing'):
         bot_info = get_runtime("botsrunner_ncmbot-bot_1", "NCM Bot")
-        client_info = get_runtime("botsrunner_ncmbot-client_1", "NCM Client")
-        await bot.send_message(event.chat_id, f"{bot_info}\n{client_info}", parse_mode='md')
+        await bot.send_message(event.chat_id, f"{bot_info}\n", parse_mode='md')
         raise events.StopPropagation
 
 
