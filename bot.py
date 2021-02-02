@@ -32,7 +32,7 @@ async def send_welcome(event):
 @bot.on(events.NewMessage(pattern='/ping'))
 async def send_welcome(event):
     async with bot.action(event.chat_id, 'typing'):
-        bot_info = get_runtime("botsrunner_ncmbot-bot_1", "NCM Bot")
+        bot_info = get_runtime("botsrunner_ncmbot_1", "NCM Bot")
         await bot.send_message(event.chat_id, f"{bot_info}\n", parse_mode='md')
         raise events.StopPropagation
 
