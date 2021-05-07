@@ -9,6 +9,7 @@ __author__ = "Benny <benny.think@gmail.com>"
 
 import tempfile
 import os
+import platform
 
 from telethon import TelegramClient, events
 from tgbot_ping import get_runtime
@@ -17,7 +18,10 @@ from helper import *
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s [%(levelname)s]: %(message)s')
 
-bot = TelegramClient('bot', 1234, "api_hash").start(bot_token=os.getenv("TOKEN"))
+bot = TelegramClient('bot', 1234, "api_hash",
+                     device_model=f"{platform.system()} {platform.node()}-{os.path.basename(__file__)}",
+                     system_version=platform.platform()
+                     ).start(bot_token=os.getenv("TOKEN"))
 
 
 @bot.on(events.NewMessage(pattern='/start'))
