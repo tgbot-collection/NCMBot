@@ -5,3 +5,4 @@ aiohttp
 hachoir
 requests
 tgbot-ping
+fakeredis
