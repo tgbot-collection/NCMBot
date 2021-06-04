@@ -1,8 +1,7 @@
-telethon
-ncmdump
-cryptg
-aiohttp
-hachoir
-requests
-tgbot-ping
-fakeredis
+telethon==1.21.1
+ncmdump==0.1.1
+cryptg==0.2.post4
+requests==2.25.1
+tgbot-ping==1.0.1
+fakeredis==1.5.0
+filetype==1.0.7

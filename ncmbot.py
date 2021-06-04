@@ -14,6 +14,7 @@ import logging
 import traceback
 
 import fakeredis
+import filetype
 from telethon import TelegramClient, events, utils, types
 from tgbot_ping import get_runtime
 from ncmdump import dump
@@ -63,14 +64,23 @@ async def upload_callback(current, total, chat_id, message):
         await bot.edit_message(chat_id, message, new_message)
 
 
-def ncm_converter(ncm_path, mp3_path):
-    logging.info("Converting %s -> %s", ncm_path, mp3_path)
+def ncm_converter(ncm_path, file_wo_ext) -> dict:
+    logging.info("Converting %s -> %s", ncm_path, file_wo_ext)
+    status = {"status": False, "filepath": None, "message": None}
     try:
-        dump(ncm_path, mp3_path, False)
+        dump(ncm_path, file_wo_ext, False)
+        ext = filetype.guess_extension(file_wo_ext)
+        real_name = file_wo_ext + f".{ext}"
+        os.rename(file_wo_ext, real_name)
+        status["status"] = True
+        status["filepath"] = real_name
+        logging.info("real filename is %s", real_name)
     except Exception:
         err = traceback.format_exc()
-        logging.error("Convert failed for %s -> %s \n%s\n", ncm_path, mp3_path, err)
-        return err
+        logging.error("Convert failed for %s -> %s \n%s\n", ncm_path, file_wo_ext, err)
+        status["message"] = err
+    finally:
+        return status
 
 
 @bot.on(events.NewMessage(pattern='/start'))
@@ -110,7 +120,7 @@ async def echo_all(event):
     message = await event.reply("文件已收到，正在处理中……")
 
     temp_dir = tempfile.TemporaryDirectory()
-    mp3_filepath = os.path.join(temp_dir.name, ncm_name[0:-4] + ".mp3")
+    file_wo_ext = os.path.join(temp_dir.name, ncm_name[0:-4])
 
     with tempfile.NamedTemporaryFile() as tmp:
         async with bot.action(event.chat_id, 'audio'):
@@ -118,17 +128,18 @@ async def echo_all(event):
                 await download_file(event.client, event.document, out,
                                     progress_callback=lambda x, y: download_callback(x, y, chat_id, message))
             await bot.edit_message(chat_id, message, '⏳ 正在转换格式……')
-            result = ncm_converter(out.name, mp3_filepath)
-        if result:
+            result = ncm_converter(out.name, file_wo_ext)
+        if result["status"] is False:
             async with bot.action(event.chat_id, 'typing'):
                 await bot.edit_message(chat_id, message, f"{ncm_name} 转换失败❌：\n```{result}```",
                                        parse_mode='markdown')
         else:
+            real_file = result["filepath"]
             async with bot.action(event.chat_id, 'document'):
-                with open(mp3_filepath, "rb") as out:
+                with open(real_file, "rb") as out:
                     res = await upload_file(bot, out,
                                             progress_callback=lambda x, y: upload_callback(x, y, chat_id, message))
-                attributes, mime_type = utils.get_attributes(mp3_filepath)
+                attributes, mime_type = utils.get_attributes(real_file)
                 media = types.InputMediaUploadedDocument(
                     file=res,
                     mime_type=mime_type,
