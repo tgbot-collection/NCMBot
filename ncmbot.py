@@ -23,7 +23,9 @@ from FastTelethon import download_file, upload_file
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s [%(levelname)s]: %(message)s')
 
-bot = TelegramClient('bot', 1234, "api_hash",
+app_id = int(os.getenv("APP_ID", 0))
+app_hash = os.getenv("APP_HASH")
+bot = TelegramClient('bot', app_id, app_hash,
                      device_model=f"{platform.system()} {platform.node()}-{os.path.basename(__file__)}",
                      system_version=platform.platform()
                      ).start(bot_token=os.getenv("TOKEN"))
