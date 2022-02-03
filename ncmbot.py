@@ -12,6 +12,7 @@ import os
 import pathlib
 import random
 import tempfile
+import time
 import traceback
 import typing
 
@@ -75,23 +76,23 @@ def sizeof_fmt(num: int, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
-def ncm_converter(tmp_name: "str", normal_name="test.ncm") -> "dict":
-    # normal_name hello.ncm
-    normal_name = normal_name.replace(".ncm", "")
-    tmp_new_name = f"{tmp_name}.temp"
-    logging.info("Converting %s -> %s", tmp_name, tmp_new_name)
+def ncm_converter(ncm_path: "str") -> "dict":
+    ncm = pathlib.Path(ncm_path)
+    tmp_name: "str" = ncm.parent.joinpath(ncm.name.rsplit(".")[0]).as_posix()
+
+    logging.info("Converting %s -> %s", ncm_path, tmp_name)
     status = {"status": False, "filepath": None, "message": None}
     try:
-        dump(tmp_name, tmp_new_name, False)
-        ext = filetype.guess_extension(tmp_new_name)
-        real_name = pathlib.PosixPath(tmp_name).parent.joinpath(f"{normal_name}.{ext}").as_posix()
-        os.rename(tmp_new_name, real_name)
+        dump(ncm_path, tmp_name, False)
+        ext = filetype.guess_extension(tmp_name)
+        real_name = tmp_name + "." + ext
+        os.rename(tmp_name, real_name)
         status["status"] = True
         status["filepath"] = real_name
         logging.info("real filename is %s", real_name)
     except Exception:
         err = traceback.format_exc()
-        logging.error("Convert failed for %s -> %s \n%s\n", tmp_name, tmp_new_name, err)
+        logging.error("Convert failed for %s -> %s \n%s\n", ncm_path, tmp_name, err)
         status["error"] = err
     finally:
         return status
@@ -136,13 +137,13 @@ def convert_handler(client: "Client", message: "types.Message"):
         return
 
     bot_message: typing.Union["types.Message", "typing.Any"] = message.reply("文件已收到，正在处理中……", quote=True)
-
-    with tempfile.NamedTemporaryFile() as tmp:
+    logging.info("New conversion request from %s[%s]", chat_id, ncm_name)
+    with tempfile.TemporaryDirectory() as tmp:
         client.send_chat_action(chat_id, "typing")
-        filename = tmp.name
+        filename = pathlib.Path(tmp).joinpath(ncm_name).as_posix()
         message.download(filename, progress=download_hook, progress_args=(bot_message,))
         bot_message.edit_text("⏳ 正在转换格式……")
-        result = ncm_converter(filename, ncm_name)
+        result = ncm_converter(filename)
         if result["status"]:
             client.send_chat_action(chat_id, "upload_audio")
             client.send_audio(chat_id, result["filepath"],

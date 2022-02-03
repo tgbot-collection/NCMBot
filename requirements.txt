@@ -1,6 +1,6 @@
-pyrogram==1.2.11
-tgcrypto==1.2.2
+pyrogram==1.4.0
+tgcrypto==1.2.3
 ncmdump==0.1.1
 tgbot-ping==1.0.1
 fakeredis==1.5.0
-filetype==1.0.7
+filetype==1.0.9
