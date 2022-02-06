@@ -12,7 +12,6 @@ import os
 import pathlib
 import random
 import tempfile
-import time
 import traceback
 import typing
 
@@ -78,15 +77,13 @@ def sizeof_fmt(num: int, suffix='B'):
 
 def ncm_converter(ncm_path: "str") -> "dict":
     ncm = pathlib.Path(ncm_path)
-    tmp_name: "str" = ncm.parent.joinpath(ncm.name.rsplit(".")[0]).as_posix()
-
+    tmp_name = ncm.with_suffix(".temp")
     logging.info("Converting %s -> %s", ncm_path, tmp_name)
     status = {"status": False, "filepath": None, "message": None}
     try:
         dump(ncm_path, tmp_name, False)
         ext = filetype.guess_extension(tmp_name)
-        real_name = tmp_name + "." + ext
-        os.rename(tmp_name, real_name)
+        real_name = tmp_name.rename(ncm.with_suffix(f".{ext}"))
         status["status"] = True
         status["filepath"] = real_name
         logging.info("real filename is %s", real_name)
