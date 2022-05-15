@@ -18,7 +18,7 @@ import typing
 import fakeredis
 import filetype
 from ncmdump import dump
-from pyrogram import Client, filters, types
+from pyrogram import Client, filters, types, enums
 from tgbot_ping import get_runtime
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(filename)s [%(levelname)s]: %(message)s')
@@ -48,7 +48,7 @@ EXPIRE = 5
 
 
 def edit_text(bot_msg, text):
-    key = f"{bot_msg.chat.id}-{bot_msg.message_id}"
+    key = f"{bot_msg.chat.id}-{bot_msg.id}"
     # if the key exists, we shouldn't send edit message
     if not r.exists(key):
         r.set(key, "ok", ex=EXPIRE)
@@ -98,7 +98,7 @@ def ncm_converter(ncm_path: "str") -> "dict":
 @app.on_message(filters.command(["start"]))
 def start_handler(client: "Client", message: "types.Message"):
     chat_id = message.chat.id
-    client.send_chat_action(chat_id, "typing")
+    client.send_chat_action(chat_id, enums.ChatAction.TYPING)
 
     client.send_message(message.chat.id, "我可以帮你转换网易云音乐的ncm为普通的mp3/flac文件。"
                                          "直接把ncm文件发给我就可以了。"
@@ -108,7 +108,7 @@ def start_handler(client: "Client", message: "types.Message"):
 @app.on_message(filters.command(["about"]))
 def help_handler(client: "Client", message: "types.Message"):
     chat_id = message.chat.id
-    client.send_chat_action(chat_id, "typing")
+    client.send_chat_action(chat_id, enums.ChatAction.TYPING)
     client.send_message(chat_id, "网易云ncm格式转换机器人 @BennyThink "
                                  "GitHub: https://github.com/tgbot-collection/NCMBot")
 
@@ -116,7 +116,7 @@ def help_handler(client: "Client", message: "types.Message"):
 @app.on_message(filters.command(["ping"]))
 def ping_handler(client: "Client", message: "types.Message"):
     chat_id = message.chat.id
-    client.send_chat_action(chat_id, "typing")
+    client.send_chat_action(chat_id, enums.ChatAction.TYPING)
     if os.uname().sysname == "Darwin":
         bot_info = "test"
     else:
@@ -127,7 +127,7 @@ def ping_handler(client: "Client", message: "types.Message"):
 @app.on_message(filters.incoming & filters.document)
 def convert_handler(client: "Client", message: "types.Message"):
     chat_id = message.chat.id
-    client.send_chat_action(chat_id, "typing")
+    client.send_chat_action(chat_id, enums.ChatAction.TYPING)
     ncm_name = message.document.file_name
     if not ncm_name.endswith(".ncm"):
         message.reply("不是ncm文件🤔", quote=True)
@@ -136,13 +136,13 @@ def convert_handler(client: "Client", message: "types.Message"):
     bot_message: typing.Union["types.Message", "typing.Any"] = message.reply("文件已收到，正在处理中……", quote=True)
     logging.info("New conversion request from %s[%s]", chat_id, ncm_name)
     with tempfile.TemporaryDirectory() as tmp:
-        client.send_chat_action(chat_id, "typing")
+        client.send_chat_action(chat_id, enums.ChatAction.TYPING)
         filename = pathlib.Path(tmp).joinpath(ncm_name).as_posix()
         message.download(filename, progress=download_hook, progress_args=(bot_message,))
         bot_message.edit_text("⏳ 正在转换格式……")
         result = ncm_converter(filename)
         if result["status"]:
-            client.send_chat_action(chat_id, "upload_audio")
+            client.send_chat_action(chat_id, enums.ChatAction.UPLOAD_AUDIO)
             client.send_audio(chat_id, result["filepath"],
                               progress=upload_hook, progress_args=(bot_message,))
             bot_message.edit_text("转换成功!✅")
@@ -152,7 +152,7 @@ def convert_handler(client: "Client", message: "types.Message"):
 
 @app.on_message(filters.incoming)
 def text_handler(client: "Client", message: "types.Message"):
-    message.reply_chat_action("typing")
+    message.reply_chat_action(enums.ChatAction.TYPING)
     text = ["世上没有什么事情比必然与偶然更难懂了，就像要懂得木头人的爱恋之情一样困难。",
             "咱活到现在，只要是让咱感到羞耻的人，咱都可以说出那个人的名字。这些名字当中还得再加上一个新的名字，那就是汝！",
             "半吊子的聪明只会招来死亡。",
