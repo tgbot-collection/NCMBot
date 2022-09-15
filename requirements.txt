@@ -1,4 +1,4 @@
-pyrogram==2.0.51
+pyrogram==2.0.52
 tgcrypto==1.2.3
 ncmdump==0.1.1
 tgbot-ping==1.0.4
