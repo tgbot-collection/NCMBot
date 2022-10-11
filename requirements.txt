@@ -1,5 +1,5 @@
 pyrogram==2.0.57
-tgcrypto==1.2.3
+tgcrypto==1.2.4
 ncmdump==0.1.1
 tgbot-ping==1.0.4
 fakeredis==1.9.3
