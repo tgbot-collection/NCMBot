@@ -3,4 +3,4 @@ tgcrypto==1.2.4
 ncmdump==0.1.1
 tgbot-ping==1.0.4
 fakeredis==1.10.0
-filetype==1.1.0
+filetype==1.2.0
