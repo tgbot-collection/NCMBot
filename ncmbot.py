@@ -30,7 +30,7 @@ def customize_logger(logger: "list"):
         logging.getLogger(log).setLevel(level=logging.WARNING)
 
 
-def create_app(session="ytdl", workers=20):
+def create_app(session="ytdl", workers=50):
     app_id = int(os.getenv("APP_ID", 0))
     app_hash = os.getenv("APP_HASH")
     token = os.getenv("TOKEN")
