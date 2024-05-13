@@ -2,5 +2,5 @@ pyrogram==2.0.106
 tgcrypto==1.2.5
 ncmdump==0.1.1
 tgbot-ping==1.0.7
-fakeredis==2.21.0
+fakeredis==2.23.1
 filetype==1.2.0
